@@ -2,9 +2,6 @@ import React from "react";
 import { Input } from "../components/input";
 import { Label } from "../components/label";
 import { useForm } from "react-hook-form";
-import { IconEyeClose, IconEyeOpen } from "../components/icons";
-import { Field } from "../components/field";
-import { useState } from "react";
 import { Button } from "../components/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +12,8 @@ import { auth, db } from "../firebase/firebase-config";
 import { NavLink, useNavigate } from "react-router-dom";
 import { addDoc, collection } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
+import InputPasswordToggle from "../components/input/InputPasswordToggle";
+import { Field } from "../components/field";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter you fullname"),
@@ -71,7 +70,6 @@ const SignUpPage = () => {
     // });
   };
 
-  const [togglePassword, setTogglePassword] = useState(false);
   useEffect(() => {
     const arrErrors = Object.values(errors);
     if (arrErrors.length > 0) {
@@ -108,27 +106,9 @@ const SignUpPage = () => {
         </Field>
         <Field>
           <Label htmlFor="password">Password</Label>
-          <Input
-            type={togglePassword ? "text" : "password"}
-            name="password"
-            placeholder="Enter your password..."
-            control={control}
-          >
-            {!togglePassword ? (
-              <IconEyeClose
-                onClick={() => {
-                  setTogglePassword(true);
-                }}
-              ></IconEyeClose>
-            ) : (
-              <IconEyeOpen
-                onClick={() => {
-                  setTogglePassword(false);
-                }}
-              ></IconEyeOpen>
-            )}
-          </Input>
+          <InputPasswordToggle control={control}></InputPasswordToggle>
         </Field>
+
         <div className="have-account">
           Already have an account? <NavLink to={"/sign-in"}>Login</NavLink>
         </div>
