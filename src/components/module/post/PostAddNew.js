@@ -13,7 +13,14 @@ import ImageUpload from "../../image/ImageUpload";
 import useFirebaseImage from "../../../hooks/useFirebaseImage";
 import Toggle from "../../toggle/Toggle";
 import { useEffect } from "react";
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  query,
+  serverTimestamp,
+  where,
+} from "firebase/firestore";
 import { db } from "../../../firebase/firebase-config";
 import { useAuth } from "../../../contexts/auth-context";
 import { toast } from "react-toastify";
@@ -22,7 +29,7 @@ const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
   const { userInfo } = useAuth();
-  const { control, watch, setValue, handleSubmit, getValues } = useForm({
+  const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
     mode: "onChange",
     defaultValues: {
       title: "",
@@ -46,11 +53,21 @@ const PostAddNew = () => {
       ...cloneValues,
       image,
       userId: userInfo.uid,
+      createdAt: serverTimestamp,
     });
     toast.success("Create new post successfully!");
-    console.log("addPostHandler ~ cloneValues", cloneValues);
+    reset({
+      title: "",
+      slug: "",
+      status: "2",
+      categoryId: "",
+      hot: false,
+      image: "",
+    });
+    setSelectCategory({});
   };
   const [categories, setCategories] = useState([]);
+  const [selectCategory, setSelectCategory] = useState("");
 
   useEffect(() => {
     async function getData() {
@@ -70,6 +87,11 @@ const PostAddNew = () => {
     }
     getData();
   }, []);
+
+  const handleClickOption = (item) => {
+    setValue("categoryId", item.id);
+    setSelectCategory(item);
+  };
 
   return (
     <PostAddNewStyles>
@@ -108,14 +130,16 @@ const PostAddNew = () => {
           <Field>
             <Label>Category</Label>
             <Dropdown>
-              <Dropdown.Select placeholder="Select category"></Dropdown.Select>
+              <Dropdown.Select
+                placeholder={`${selectCategory?.name || "Select category"}`}
+              ></Dropdown.Select>
               <Dropdown.List>
                 {categories.length > 0 &&
                   categories.map((item) => (
                     <Dropdown.Option
                       key={item.id}
                       onClick={() => {
-                        setValue("categoryId", item.id);
+                        handleClickOption(item);
                       }}
                     >
                       {item.name}
@@ -123,6 +147,11 @@ const PostAddNew = () => {
                   ))}
               </Dropdown.List>
             </Dropdown>
+            {selectCategory?.name && (
+              <span className="inline-block p-3 text-sm font-medium bg-blue-100 rounded-lg">
+                {selectCategory?.name}
+              </span>
+            )}
           </Field>
           {/* <Field>
             <Label>Author</Label>
