@@ -14,6 +14,7 @@ import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
 import InputPasswordToggle from "../components/input/InputPasswordToggle";
 import { Field } from "../components/field";
+import slugify from "slugify";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter you fullname"),
@@ -59,6 +60,7 @@ const SignUpPage = () => {
       fullname: values.fullname,
       email: values.email,
       password: values.password,
+      username: slugify(values.fullname, { lower: true }),
     });
     // await addDoc(colRef, {
     //     fullname: values.fullname,
