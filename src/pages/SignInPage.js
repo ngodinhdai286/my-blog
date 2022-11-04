@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Field } from "../components/field";
@@ -11,9 +11,9 @@ import { Button } from "../components/button";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
-import { IconEyeClose, IconEyeOpen } from "../components/icons";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase-config";
+import InputPasswordToggle from "../components/input/InputPasswordToggle";
 
 const schema = yup.object({
   email: yup
@@ -35,7 +35,6 @@ const SignInPage = () => {
     mode: "onChange",
     resolver: yupResolver(schema),
   });
-  const [togglePassword, setTogglePassword] = useState(false);
 
   useEffect(() => {
     const arrErrors = Object.values(errors);
@@ -51,9 +50,9 @@ const SignInPage = () => {
   //   console.log(userInfo);
   useEffect(() => {
     document.title = "SignIn Page";
-    if (userInfo?.email) {
-      navigate("/");
-    }
+    // if (userInfo?.email) {
+    //   navigate("/");
+    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,26 +78,7 @@ const SignInPage = () => {
         </Field>
         <Field>
           <Label htmlFor="password">Password</Label>
-          <Input
-            type={togglePassword ? "text" : "password"}
-            name="password"
-            placeholder="Enter your password..."
-            control={control}
-          >
-            {!togglePassword ? (
-              <IconEyeClose
-                onClick={() => {
-                  setTogglePassword(true);
-                }}
-              ></IconEyeClose>
-            ) : (
-              <IconEyeOpen
-                onClick={() => {
-                  setTogglePassword(false);
-                }}
-              ></IconEyeOpen>
-            )}
-          </Input>
+          <InputPasswordToggle control={control}></InputPasswordToggle>
         </Field>
         <div className="have-account">
           Haven't had an account yet?{" "}
@@ -107,7 +87,8 @@ const SignInPage = () => {
         <Button
           type="submit"
           style={{
-            maxWidth: 300,
+            width: "100%",
+            maxWidth: "300px",
             margin: "0 auto",
           }}
           isLoading={isSubmitting}
