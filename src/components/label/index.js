@@ -1,3 +1,2 @@
-import Label from "./Label";
-
-export { Label };
+export { default as LabelStatus } from "./LabelStatus";
+export { default as Label } from "./Label";
