@@ -1,17 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
-import { Button } from "../../button";
-import { Radio } from "../../checkbox";
-import { Dropdown } from "../../dropdown";
-import { Field } from "../../field";
-import { Input } from "../../input";
-import { Label } from "../../label";
-import slugify from "slugify";
-import { postStatus } from "../../../utils/constants";
-import ImageUpload from "../../image/ImageUpload";
-import useFirebaseImage from "../../../hooks/useFirebaseImage";
-import Toggle from "../../toggle/Toggle";
 import { useEffect } from "react";
 import {
   addDoc,
@@ -21,9 +10,20 @@ import {
   serverTimestamp,
   where,
 } from "firebase/firestore";
-import { db } from "../../../firebase/firebase-config";
+import { db } from "../../../firebase-app/firebase-config";
 import { useAuth } from "../../../contexts/auth-context";
 import { toast } from "react-toastify";
+import { Field, FieldCheckboxes } from "components/field";
+import { Label } from "components/label";
+import { Input } from "components/input";
+import ImageUpload from "components/image/ImageUpload";
+import { Dropdown } from "components/dropdown";
+import Toggle from "components/toggle/Toggle";
+import { Radio } from "components/checkbox";
+import { postStatus } from "utils/constants";
+import { Button } from "components/button";
+import useFirebaseImage from "hooks/useFirebaseImage";
+import slugify from "slugify";
 
 const PostAddNewStyles = styled.div``;
 
@@ -42,32 +42,48 @@ const PostAddNew = () => {
   const watchStatus = watch("status");
   const watchHot = watch("hot");
 
-  const { image, progress, handleSelectImage, handleDeleteImage } =
-    useFirebaseImage(setValue, getValues);
+  const {
+    image,
+    progress,
+    handleSelectImage,
+    handleDeleteImage,
+    handleResetUpload,
+  } = useFirebaseImage(setValue, getValues);
   const addPostHandler = async (values) => {
-    const cloneValues = { ...values };
-    cloneValues.slug = slugify(values.slug || values.title, { lower: true });
-    cloneValues.status = Number(values.status);
-    const colRef = collection(db, "posts");
-    await addDoc(colRef, {
-      ...cloneValues,
-      image,
-      userId: userInfo.uid,
-      createdAt: serverTimestamp,
-    });
-    toast.success("Create new post successfully!");
-    reset({
-      title: "",
-      slug: "",
-      status: "2",
-      categoryId: "",
-      hot: false,
-      image: "",
-    });
-    setSelectCategory({});
+    setLoading(true);
+    try {
+      const cloneValues = { ...values };
+      cloneValues.slug = slugify(values.slug || values.title, {
+        lower: true,
+      });
+      cloneValues.status = Number(values.status);
+      const colRef = collection(db, "posts");
+      await addDoc(colRef, {
+        ...cloneValues,
+        image,
+        userId: userInfo.uid,
+        createdAt: serverTimestamp(),
+      });
+      toast.success("Create new post successfully!");
+      reset({
+        title: "",
+        slug: "",
+        status: "2",
+        categoryId: "",
+        hot: false,
+        image: "",
+      });
+      handleResetUpload();
+      setSelectCategory({});
+    } catch (error) {
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
   };
   const [categories, setCategories] = useState([]);
   const [selectCategory, setSelectCategory] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function getData() {
@@ -86,6 +102,10 @@ const PostAddNew = () => {
       });
     }
     getData();
+  }, []);
+
+  useEffect(() => {
+    document.title = "My blog - Create new post";
   }, []);
 
   const handleClickOption = (item) => {
@@ -168,14 +188,13 @@ const PostAddNew = () => {
               }}
             ></Toggle>
           </Field>
-          <Field>
+          <FieldCheckboxes>
             <Label>Status</Label>
             <div className="flex items-center gap-x-5">
               <Radio
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.APPROVED}
-                onClick={() => setValue("status", "approved")}
                 value={postStatus.APPROVED}
               >
                 Approved
@@ -184,7 +203,6 @@ const PostAddNew = () => {
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.PENDING}
-                onClick={() => setValue("status", "pending")}
                 value={postStatus.PENDING}
               >
                 Pending
@@ -193,15 +211,19 @@ const PostAddNew = () => {
                 name="status"
                 control={control}
                 checked={Number(watchStatus) === postStatus.REJECTED}
-                onClick={() => setValue("status", "reject")}
                 value={postStatus.REJECTED}
               >
                 Reject
               </Radio>
             </div>
-          </Field>
+          </FieldCheckboxes>
         </div>
-        <Button type="submit" className="mx-auto">
+        <Button
+          type="submit"
+          className="mx-auto w-[250px]"
+          isLoading={loading}
+          disabled={loading}
+        >
           Add new post
         </Button>
       </form>
