@@ -8,7 +8,7 @@ import {
 import React, { useState } from "react";
 import { useEffect } from "react";
 import styled from "styled-components";
-import { db } from "../../../firebase/firebase-config";
+import { db } from "../../../firebase-app/firebase-config";
 import Heading from "../../layout/Heading";
 import PostFeatureItem from "../post/PostFeatureItem";
 const HomeFeatureStyles = styled.div``;
