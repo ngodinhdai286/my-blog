@@ -1,8 +1,8 @@
 import React from "react";
 import styled, { css } from "styled-components";
-import LoadingSpinner from "../loading/LoadingSpinner";
 import PropTypes from "prop-types";
 import { NavLink } from "react-router-dom";
+import LoadingSpinner from "components/loading/LoadingSpinner";
 
 const ButtonStyles = styled.button`
   display: flex;

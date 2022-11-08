@@ -1,5 +1,5 @@
 import React from "react";
-import { DropdownProvider } from "./dropdown-context";
+import { DropdownProvider } from "components/dropdown/dropdown-context";
 
 const Dropdown = ({ children, ...props }) => {
   return (

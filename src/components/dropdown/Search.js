@@ -1,5 +1,5 @@
 import React from "react";
-import { useDropdown } from "./dropdown-context";
+import { useDropdown } from "components/dropdown/dropdown-context";
 
 const Search = ({ placeholder, ...props }) => {
   const { onChange } = useDropdown();
