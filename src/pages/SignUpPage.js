@@ -1,20 +1,25 @@
 import React from "react";
-import { Input } from "../components/input";
-import { Label } from "../components/label";
+
 import { useForm } from "react-hook-form";
-import { Button } from "../components/button";
+
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db } from "../firebase/firebase-config";
+
 import { NavLink, useNavigate } from "react-router-dom";
-import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import AuthenticationPage from "./AuthenticationPage";
-import InputPasswordToggle from "../components/input/InputPasswordToggle";
-import { Field } from "../components/field";
 import slugify from "slugify";
+
+import InputPasswordToggle from "components/input/InputPasswordToggle";
+import { Field } from "components/field";
+import { Label } from "components/label";
+import { Input } from "components/input";
+import { Button } from "components/button";
+import { auth, db } from "firebase-app/firebase-config";
+import { userRoles, userStatus } from "utils/constants";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter you fullname"),
@@ -41,40 +46,32 @@ const SignUpPage = () => {
     resolver: yupResolver(schema),
   });
   const handleSignUp = async (values) => {
-    // console.log(values);
     if (!isValid) {
       return;
     }
-    console.log(values);
     const user = await createUserWithEmailAndPassword(
       auth,
       values.email,
       values.password
     );
-
     await updateProfile(auth.currentUser, {
       displayName: values.fullname,
+      photoURL:
+        "https://images.unsplash.com/photo-1667820085972-d33e945a5154?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80",
     });
-    const colRef = collection(db, "users");
     await setDoc(doc(db, "users", auth.currentUser.uid), {
       fullname: values.fullname,
       email: values.email,
       password: values.password,
       username: slugify(values.fullname, { lower: true }),
+      avatar:
+        "https://images.unsplash.com/photo-1667581030857-dcaff95185c1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
+      status: userStatus.ACTIVE,
+      role: userRoles.USER,
+      createdAt: serverTimestamp(),
     });
-    // await addDoc(colRef, {
-    //     fullname: values.fullname,
-    //   email: values.email,
-    //   password: values.password,
-    // });
     toast.success("Register successfully!");
     navigate("/");
-
-    // return new Promise((resolve) => {
-    //   setTimeout(() => {
-    //     resolve();
-    //   }, 5000);
-    // });
   };
 
   useEffect(() => {
