@@ -30,7 +30,6 @@ const DashboardLayout = ({ children }) => {
   if (!userInfo) {
     return <NotFoundPage></NotFoundPage>;
   }
-  console.log("DashboardLayout ~ userInfo", userInfo);
   return (
     <DashboardStyles>
       <DashboardHeader></DashboardHeader>
