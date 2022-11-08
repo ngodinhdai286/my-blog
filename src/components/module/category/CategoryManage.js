@@ -1,7 +1,7 @@
 import { ActionDelete, ActionEdit, ActionView } from "components/action";
 import { LabelStatus } from "components/label";
 import { Table } from "components/table";
-import { db } from "../../../firebase/firebase-config";
+import { db } from "../../../firebase-app/firebase-config";
 import {
   collection,
   deleteDoc,
