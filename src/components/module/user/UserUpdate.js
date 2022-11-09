@@ -4,68 +4,65 @@ import { Field, FieldCheckboxes } from "components/field";
 import ImageUpload from "components/image/ImageUpload";
 import { Input } from "components/input";
 import { Label } from "components/label";
-import { useAuth } from "contexts/auth-context";
 import { db } from "firebase-app/firebase-config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import useFirebaseImage from "hooks/useFirebaseImage";
-import React, { useEffect } from "react";
+import React from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Swal from "sweetalert2";
 import { userRoles, userStatus } from "utils/constants";
 import DashboardHeading from "../dashboard/DashboardHeading";
 
 const UserUpdate = () => {
   const {
-    control,
     handleSubmit,
+    control,
     watch,
     reset,
-    getValues,
     setValue,
+    getValues,
     formState: { isValid, isSubmitting },
   } = useForm({
     mode: "onChange",
   });
-  const [params] = useSearchParams();
-  const userId = params.get("id");
   const watchStatus = watch("status");
-  const watchRole = watch("role");
+  const watchRoles = watch("role");
   const imageUrl = getValues("avatar");
   const imageRegex = /%2F(\S+)\?/gm.exec(imageUrl);
   const imageName = imageRegex?.length > 0 ? imageRegex[1] : "";
+  const deleteAvatar = async () => {
+    const colRef = doc(db, "users", userId);
+    await updateDoc(colRef, {
+      avatar: "",
+    });
+  };
   const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues, imageName, deleteAvatar);
-  const { userInfo } = useAuth();
+
+  const [params] = useSearchParams();
+  const userId = params.get("id");
+
   const handleUpdateUser = async (values) => {
     if (!isValid) return;
-    if (userInfo?.role !== userRoles.ADMIN) {
-      Swal.fire("Failed", "You have no right to do this action", "warning");
-      return;
-    }
     try {
       const colRef = doc(db, "users", userId);
       await updateDoc(colRef, {
         ...values,
         avatar: image,
       });
-      toast.success("Update user information successfully!");
+      toast.success("Update user successfully!");
     } catch (error) {
       console.log(error);
-      toast.error("Update user failed!");
+      toast.error("Cannot update user!");
     }
   };
 
-  async function deleteAvatar() {
-    const colRef = doc(db, "users", userId);
-    await updateDoc(colRef, {
-      avatar: "",
-    });
-  }
   useEffect(() => {
     setImage(imageUrl);
   }, [imageUrl, setImage]);
+
   useEffect(() => {
     async function fetchData() {
       if (!userId) return;
@@ -77,6 +74,7 @@ const UserUpdate = () => {
   }, [userId, reset]);
 
   if (!userId) return null;
+
   return (
     <div>
       <DashboardHeading
@@ -88,9 +86,9 @@ const UserUpdate = () => {
           <ImageUpload
             className="!rounded-full h-full"
             onChange={handleSelectImage}
-            handleDeleteImage={handleDeleteImage}
             progress={progress}
             image={image}
+            handleDeleteImage={handleDeleteImage}
           ></ImageUpload>
         </div>
         <div className="form-layout">
@@ -154,8 +152,8 @@ const UserUpdate = () => {
               <Radio
                 name="status"
                 control={control}
-                checked={Number(watchStatus) === userStatus.BAN}
-                value={userStatus.BAN}
+                checked={Number(watchStatus) === userStatus.BANNED}
+                value={userStatus.BANNED}
               >
                 Banned
               </Radio>
@@ -167,7 +165,7 @@ const UserUpdate = () => {
               <Radio
                 name="role"
                 control={control}
-                checked={Number(watchRole) === userRoles.ADMIN}
+                checked={Number(watchRoles) === userRoles.ADMIN}
                 value={userRoles.ADMIN}
               >
                 Admin
@@ -175,7 +173,7 @@ const UserUpdate = () => {
               <Radio
                 name="role"
                 control={control}
-                checked={Number(watchRole) === userRoles.MOD}
+                checked={Number(watchRoles) === userRoles.MOD}
                 value={userRoles.MOD}
               >
                 Moderator
@@ -183,7 +181,7 @@ const UserUpdate = () => {
               <Radio
                 name="role"
                 control={control}
-                checked={Number(watchRole) === userRoles.USER}
+                checked={Number(watchRoles) === userRoles.USER}
                 value={userRoles.USER}
               >
                 User
@@ -191,20 +189,14 @@ const UserUpdate = () => {
             </FieldCheckboxes>
           </Field>
         </div>
-        <div className="form-layout">
-          <Field>
-            <Label>Description</Label>
-            {/* <Textarea name="description" control={control}></Textarea> */}
-          </Field>
-        </div>
         <Button
-          kind="primary"
           type="submit"
+          kind="primary"
           className="mx-auto w-[200px]"
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          Update
+          Update user
         </Button>
       </form>
     </div>
