@@ -1,3 +1,4 @@
+import { Button } from "components/button";
 import React, { useState } from "react";
 import DashboardHeading from "../dashboard/DashboardHeading";
 import UserTable from "./UserTable";
@@ -9,6 +10,11 @@ const UserManage = () => {
         title="Users"
         desc="Manage your user"
       ></DashboardHeading>
+      <div className="flex justify-end mb-10">
+        <Button kind="ghost" to="/manage/add-user">
+          Add new user
+        </Button>
+      </div>
       <UserTable></UserTable>
     </div>
   );
