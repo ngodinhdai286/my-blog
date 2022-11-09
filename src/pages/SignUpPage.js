@@ -10,7 +10,6 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 
 import { NavLink, useNavigate } from "react-router-dom";
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
-import AuthenticationPage from "./AuthenticationPage";
 import slugify from "slugify";
 
 import InputPasswordToggle from "components/input/InputPasswordToggle";
@@ -20,6 +19,7 @@ import { Input } from "components/input";
 import { Button } from "components/button";
 import { auth, db } from "firebase-app/firebase-config";
 import { userRoles, userStatus } from "utils/constants";
+import AuthenticationPage from "./AuthenticationPage";
 
 const schema = yup.object({
   fullname: yup.string().required("Please enter you fullname"),

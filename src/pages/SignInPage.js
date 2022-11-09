@@ -12,8 +12,8 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebase-config";
-import InputPasswordToggle from "../components/input/InputPasswordToggle";
+import { auth } from "firebase-app/firebase-config";
+import InputPasswordToggle from "components/input/InputPasswordToggle";
 
 const schema = yup.object({
   email: yup
