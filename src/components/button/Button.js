@@ -5,47 +5,44 @@ import { NavLink } from "react-router-dom";
 import LoadingSpinner from "components/loading/LoadingSpinner";
 
 const ButtonStyles = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
   cursor: pointer;
   padding: 0 25px;
   line-height: 1;
-  color: white;
   border-radius: 8px;
-  font-size: 18px;
   font-weight: 600;
+  font-size: 16px;
   height: ${(props) => props.height || "66px"};
-
+  display: flex;
+  justify-content: center;
+  align-items: center;
   ${(props) =>
     props.kind === "secondary" &&
     css`
-      background-color: #dff6ff;
       color: ${(props) => props.theme.secondary};
+      background-color: white;
     `};
   ${(props) =>
     props.kind === "primary" &&
     css`
       color: white;
-      background-image: linear-gradient(
-        to right bottom,
-        ${(props) => props.theme.primary},
-        ${(props) => props.theme.secondary}
-      );
+      background-color: ${(props) => props.theme.primary};
+    `};
+  ${(props) =>
+    props.kind === "ghost" &&
+    css`
+      color: ${(props) => props.theme.secondary};
+      background-color: rgba(29, 192, 113, 0.1);
     `};
   &:disabled {
     opacity: 0.5;
     pointer-events: none;
   }
 `;
-
 /**
  * @param {*} onClick Handler onClick
  * @requires
- * @param {string} type Type pf Button 'button' || 'submit'
- * @returns
+ * @param {string} type Type of button 'button' | 'submit'
  */
-
 const Button = ({
   type = "button",
   onClick = () => {},
@@ -57,7 +54,7 @@ const Button = ({
   const child = !!isLoading ? <LoadingSpinner></LoadingSpinner> : children;
   if (to !== "" && typeof to === "string") {
     return (
-      <NavLink className="inline-block" to={to}>
+      <NavLink to={to} className="inline-block">
         <ButtonStyles type={type} kind={kind} {...props}>
           {child}
         </ButtonStyles>
@@ -76,7 +73,7 @@ Button.propTypes = {
   isLoading: PropTypes.bool,
   onClick: PropTypes.func,
   children: PropTypes.node,
-  kind: PropTypes.oneOf(["primary", "secondary"]),
+  kind: PropTypes.oneOf(["primary", "secondary", "ghost"]),
 };
 
 export default Button;
